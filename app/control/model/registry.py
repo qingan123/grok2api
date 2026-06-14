@@ -35,6 +35,9 @@ MODELS: tuple[ModelSpec, ...] = (
     # === grok-4.3 (grok-420-computer-use-sa) ==================================
     # Super+（basic 池不支持此模式）
     ModelSpec("grok-4.3-beta",                          ModeId.GROK_4_3, Tier.SUPER, Capability.CHAT,       True, "Grok 4.3 Beta"),
+    ModelSpec("grok-4.3",                               ModeId.FAST,     Tier.BASIC, Capability.CONSOLE_CHAT, True, "Grok 4.3 High"),
+    ModelSpec("grok-4.3-high",                          ModeId.FAST,     Tier.BASIC, Capability.CONSOLE_CHAT, True, "Grok 4.3 High"),
+    ModelSpec("grok-4.20-multi-agent-high",             ModeId.FAST,     Tier.BASIC, Capability.CONSOLE_CHAT, True, "Grok 4.20 Multi-Agent High"),
 
     # === Image ==============================================================
 

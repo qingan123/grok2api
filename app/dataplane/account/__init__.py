@@ -255,13 +255,13 @@ class AccountDirectory:
 
         async with self._lock:
             if kind == FeedbackKind.SUCCESS:
-                if strategy == "random":
+                if strategy == "random" or mode_id < 0:
                     fb.apply_success_random(table, idx)
                 else:
                     fb.apply_success_quota(table, idx, mode_id)
 
             elif kind == FeedbackKind.RATE_LIMITED:
-                if strategy == "random":
+                if strategy == "random" or mode_id < 0:
                     pool_id = int(table.pool_by_idx[idx])
                     cooling_sec = _pool_cooling_sec(pool_id)
                     fb.apply_rate_limited_random(table, idx, cooling_sec=cooling_sec)
@@ -284,7 +284,12 @@ class AccountDirectory:
 
             # Quota strategy may receive authoritative quota data from upstream
             # response headers; the random strategy ignores this entirely.
-            if strategy == "quota" and remaining is not None and reset_at_ms is not None:
+            if (
+                strategy == "quota"
+                and mode_id >= 0
+                and remaining is not None
+                and reset_at_ms is not None
+            ):
                 reset_s = int(reset_at_ms // 1000)
                 fb.apply_quota_update(table, idx, mode_id, remaining, reset_s)
 

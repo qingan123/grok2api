@@ -39,6 +39,7 @@ class Capability(IntFlag):
     VIDEO = 8
     VOICE = 16
     ASSET = 32
+    CONSOLE_CHAT = 64
 
 
 # Human-readable mode strings in API order.

@@ -282,6 +282,37 @@ def build_http_headers(
     return headers
 
 
+def build_console_headers(
+    cookie_token: str,
+    *,
+    lease: ProxyLease | None = None,
+) -> dict[str, str]:
+    """Build headers for console.x.ai Responses API requests."""
+    profile = _resolve_profile(lease)
+    raw_ua = profile.user_agent
+    ua = _sanitize(raw_ua, field="user_agent")
+    browser = profile.browser
+
+    headers: dict[str, str] = {
+        "Accept": "text/event-stream",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+        "Authorization": "Bearer anonymous",
+        "Content-Type": "application/json",
+        "Origin": "https://console.x.ai",
+        "Priority": "u=1, i",
+        "Referer": "https://console.x.ai/",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-origin",
+        "User-Agent": ua,
+        "x-xai-request-id": str(uuid.uuid4()),
+    }
+    headers.update(_client_hints(browser, raw_ua))
+    headers["Cookie"] = build_sso_cookie(cookie_token, lease=lease)
+    return headers
+
+
 def build_ws_headers(
     token: Optional[str] = None,
     *,
@@ -311,4 +342,9 @@ def build_ws_headers(
     return headers
 
 
-__all__ = ["build_http_headers", "build_sso_cookie", "build_ws_headers"]
+__all__ = [
+    "build_console_headers",
+    "build_http_headers",
+    "build_sso_cookie",
+    "build_ws_headers",
+]

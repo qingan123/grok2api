@@ -119,7 +119,7 @@ docker compose up -d
 
 ### Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/chenyme/grok2api&env=LOG_LEVEL,LOG_FILE_ENABLED,DATA_DIR,LOG_DIR,ACCOUNT_STORAGE,ACCOUNT_REDIS_URL,ACCOUNT_MYSQL_URL,ACCOUNT_POSTGRESQL_URL)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Kaimonsieur/grok2api&env=GROK_APP_API_KEY,GROK_APP_APP_KEY,LOG_LEVEL,LOG_FILE_ENABLED,ACCOUNT_STORAGE,ACCOUNT_REDIS_URL,ACCOUNT_MYSQL_URL,ACCOUNT_POSTGRESQL_URL)
 
 ### Render
 
@@ -250,6 +250,9 @@ Runtime config can also be overridden with `GROK_`-prefixed environment variable
 | `grok-4.20-expert` | `expert` | `super`, prefers higher-tier pools |
 | `grok-4.20-heavy` | `heavy` | `heavy` |
 | `grok-4.3-beta` | `grok-420-computer-use-sa` | `super` |
+| `grok-4.3` | `console grok-4.3`, fixed `high` effort | `basic` |
+| `grok-4.3-high` | `console grok-4.3`, fixed `high` effort | `basic` |
+| `grok-4.20-multi-agent-high` | `console grok-4.20-multi-agent-0309`, fixed `high` effort | `basic` |
 
 ### Image
 

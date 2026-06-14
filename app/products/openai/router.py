@@ -294,6 +294,17 @@ async def chat_completions_endpoint(req: ChatCompletionRequest):
                 preset=vcfg.preset,
             )
 
+        elif spec.is_console_chat():
+            from .console_chat import completions as console_chat_completions
+
+            result = await console_chat_completions(
+                model=req.model,
+                messages=messages,
+                stream=is_stream,
+                temperature=req.temperature or 0.7,
+                top_p=req.top_p or 0.95,
+            )
+
         else:
             # reasoning_effort=None → config default; "none" → off; otherwise → on.
             if req.reasoning_effort is None:
@@ -402,19 +413,31 @@ async def responses_endpoint(req: ResponsesCreateRequest):
     else:
         emit_think = True
 
-    from .responses import create as responses_create
+    if spec.is_console_chat():
+        from .console_responses import create as responses_create
 
-    result = await responses_create(
-        model=req.model,
-        input_val=req.input,
-        instructions=req.instructions,
-        stream=is_stream,
-        emit_think=emit_think,
-        temperature=req.temperature or 0.8,
-        top_p=req.top_p or 0.95,
-        tools=req.tools or None,
-        tool_choice=req.tool_choice,
-    )
+        result = await responses_create(
+            model=req.model,
+            input_val=req.input,
+            instructions=req.instructions,
+            stream=is_stream,
+            temperature=req.temperature or 0.7,
+            top_p=req.top_p or 0.95,
+        )
+    else:
+        from .responses import create as responses_create
+
+        result = await responses_create(
+            model=req.model,
+            input_val=req.input,
+            instructions=req.instructions,
+            stream=is_stream,
+            emit_think=emit_think,
+            temperature=req.temperature or 0.8,
+            top_p=req.top_p or 0.95,
+            tools=req.tools or None,
+            tool_choice=req.tool_choice,
+        )
 
     if isinstance(result, dict):
         return JSONResponse(result)
