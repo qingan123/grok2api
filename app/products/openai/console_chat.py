@@ -47,7 +47,10 @@ async def completions(
     cfg = get_config()
     spec = resolve_model(model)
     timeout_s = cfg.get_float("chat.timeout", 120.0)
-    max_retries = selection_max_retries()
+    # Console models often return per-account 429s even while other accounts in
+    # the same pool work. Use a larger account-swap budget than the generic
+    # chat path so users do not see intermittent empty/failed 4.3 responses.
+    max_retries = max(selection_max_retries(), 5)
     retry_codes = _configured_retry_codes(cfg)
     response_id = make_response_id()
 
