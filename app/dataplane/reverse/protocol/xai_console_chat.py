@@ -14,8 +14,7 @@ CONSOLE_MODELS: dict[str, str] = {
     "grok-4.20-multi-agent-high": "grok-4.20-multi-agent-0309",
 }
 
-_FIXED_EFFORT: dict[str, str] = {
-    "grok-4.3": "high",
+_DEFAULT_EFFORT: dict[str, str] = {
     "grok-4.3-high": "high",
     "grok-4.20-multi-agent-high": "high",
 }
@@ -78,10 +77,8 @@ def build_console_payload(
 ) -> dict[str, Any]:
     """Build a console.x.ai /v1/responses payload from OpenAI chat messages."""
     console_model = CONSOLE_MODELS.get(model, model)
-    effort = _FIXED_EFFORT.get(model) or _EFFORT_MAP.get(
-        reasoning_effort or "medium",
-        "medium",
-    )
+    default_effort = _DEFAULT_EFFORT.get(model, "none")
+    effort = _EFFORT_MAP.get(reasoning_effort or default_effort, default_effort)
 
     input_items: list[dict[str, Any]] = []
     for message in messages:
@@ -104,10 +101,10 @@ def build_console_payload(
         "temperature": temperature,
         "top_p": top_p,
         "store": False,
-        "include": ["reasoning.encrypted_content"],
         "stream": stream,
     }
-    if console_model in _MODELS_WITH_REASONING:
+    if console_model in _MODELS_WITH_REASONING and effort != "none":
+        payload["include"] = ["reasoning.encrypted_content"]
         payload["reasoning"] = {"effort": effort}
     if console_model in _MODELS_WITH_SEARCH_TOOLS:
         payload["tools"] = [
