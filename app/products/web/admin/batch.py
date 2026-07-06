@@ -174,7 +174,16 @@ async def _dispatch_async(
 async def _nsfw_one(repo: "AccountRepository", token: str, enabled: bool) -> dict:
     from app.dataplane.reverse.protocol.xai_auth import nsfw_sequence, set_nsfw
     if enabled:
-        await nsfw_sequence(token)
+        try:
+            await nsfw_sequence(token)
+        except UpstreamError as exc:
+            # Some valid chat sessions are currently rate-limited on the
+            # age-gate endpoint (/rest/auth/set-birth-date) while the actual
+            # NSFW preference gRPC call can still succeed.  Fall back to the
+            # minimal preference update instead of failing the whole toggle.
+            if exc.status != 429:
+                raise
+            await set_nsfw(token, True)
     else:
         await set_nsfw(token, enabled)
     patch = AccountPatch(token=token, add_tags=["nsfw"]) if enabled else AccountPatch(token=token, remove_tags=["nsfw"])
