@@ -301,7 +301,6 @@ async def chat_completions_endpoint(req: ChatCompletionRequest):
                 model=req.model,
                 messages=messages,
                 stream=is_stream,
-                reasoning_effort=req.reasoning_effort,
                 temperature=req.temperature or 0.7,
                 top_p=req.top_p or 0.95,
             )
@@ -422,7 +421,6 @@ async def responses_endpoint(req: ResponsesCreateRequest):
             input_val=req.input,
             instructions=req.instructions,
             stream=is_stream,
-            reasoning_effort=(req.reasoning or {}).get("effort") if isinstance(req.reasoning, dict) else None,
             temperature=req.temperature or 0.7,
             top_p=req.top_p or 0.95,
         )

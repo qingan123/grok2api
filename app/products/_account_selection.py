@@ -11,31 +11,17 @@ from app.platform.config.snapshot import get_config
 # value without introducing scattered magic numbers.
 _RANDOM_MAX_RETRIES = 5
 
-# console.x.ai models commonly return per-account/team 429s while other imported
-# accounts are still usable.  A six-account budget makes grok-4.3 look empty in
-# clients when the first handful of random accounts are exhausted, so console
-# adapters may need to scan a large imported account pool before surfacing an
-# upstream 429 to the client.
-_CONSOLE_RANDOM_MAX_RETRIES = 91
-
 
 def selection_max_retries() -> int:
-    """Retry count for generic account-swap loops."""
+    """Retry count for account-swap loops, aware of the active selection strategy.
+
+    - ``random`` strategy: fixed at :data:`_RANDOM_MAX_RETRIES` (=5).
+    - ``quota`` strategy:  reads ``retry.max_retries`` (default 1), preserving
+      the historical behaviour.
+    """
     if current_strategy() == "random":
         return _RANDOM_MAX_RETRIES
     return int(get_config("retry.max_retries", 1))
-
-
-def console_selection_max_retries() -> int:
-    """Retry count for console.x.ai account-swap loops.
-
-    Console adapters intentionally use ``reserve_any`` because the console API's
-    quota surface is separate from the app-chat quota table.  Therefore both
-    random and quota selector modes need a wider account-swap budget: many
-    imported accounts can return 429 while another account still works.
-    """
-    configured = int(get_config("retry.max_retries", 1))
-    return max(configured, _CONSOLE_RANDOM_MAX_RETRIES)
 
 
 def mode_candidates(spec: ModelSpec) -> tuple[int, ...]:

@@ -18,7 +18,7 @@ from app.platform.errors import RateLimitError, UpstreamError
 from app.platform.logging.logger import logger
 from app.platform.runtime.clock import now_s
 from app.platform.tokens import estimate_prompt_tokens, estimate_tokens
-from app.products._account_selection import console_selection_max_retries
+from app.products._account_selection import selection_max_retries
 from app.products.openai.chat import (
     _configured_retry_codes,
     _fail_sync,
@@ -40,7 +40,6 @@ async def completions(
     messages: list[dict],
     stream: bool = True,
     emit_think: bool | None = None,
-    reasoning_effort: str | None = None,
     temperature: float = 0.7,
     top_p: float = 0.95,
 ) -> dict | AsyncGenerator[str, None]:
@@ -51,7 +50,7 @@ async def completions(
     # Console models often return per-account 429s even while other accounts in
     # the same pool work. Use a larger account-swap budget than the generic
     # chat path so users do not see intermittent empty/failed 4.3 responses.
-    max_retries = console_selection_max_retries()
+    max_retries = max(selection_max_retries(), 5)
     retry_codes = _configured_retry_codes(cfg)
     response_id = make_response_id()
 
@@ -94,7 +93,6 @@ async def completions(
                         model=model,
                         temperature=temperature,
                         top_p=top_p,
-                        reasoning_effort=reasoning_effort,
                         stream=True,
                     )
                     try:
@@ -181,7 +179,6 @@ async def completions(
                 model=model,
                 temperature=temperature,
                 top_p=top_p,
-                reasoning_effort=reasoning_effort,
                 stream=True,
             )
             try:

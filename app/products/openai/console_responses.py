@@ -16,7 +16,7 @@ from app.platform.errors import RateLimitError, UpstreamError
 from app.platform.logging.logger import logger
 from app.platform.runtime.clock import now_s
 from app.platform.tokens import estimate_prompt_tokens, estimate_tokens
-from app.products._account_selection import console_selection_max_retries
+from app.products._account_selection import selection_max_retries
 from app.products.openai.chat import (
     _configured_retry_codes,
     _fail_sync,
@@ -38,14 +38,13 @@ async def create(
     input_val: str | list,
     instructions: str | None,
     stream: bool,
-    reasoning_effort: str | None,
     temperature: float,
     top_p: float,
 ) -> dict | AsyncGenerator[str, None]:
     cfg = get_config()
     spec = resolve_model(model)
     timeout_s = cfg.get_float("chat.timeout", 120.0)
-    max_retries = console_selection_max_retries()
+    max_retries = selection_max_retries()
     retry_codes = _configured_retry_codes(cfg)
     response_id = make_resp_id("resp")
     message_id = make_resp_id("msg")
@@ -84,7 +83,6 @@ async def create(
                         model=model,
                         temperature=temperature,
                         top_p=top_p,
-                        reasoning_effort=reasoning_effort,
                         stream=True,
                     )
                     try:
@@ -247,7 +245,6 @@ async def create(
                 model=model,
                 temperature=temperature,
                 top_p=top_p,
-                reasoning_effort=reasoning_effort,
                 stream=True,
             )
             try:
