@@ -51,9 +51,9 @@ def build_nsfw_mgmt_payload(enabled: bool = True) -> bytes:
 
 
 def build_set_birth_payload() -> dict:
-    """JSON payload for /rest/auth/set-birth-date with a random adult birth date."""
+    """JSON payload for /rest/auth/set-birth-date with a random 40s birth date."""
     today         = datetime.date.today()
-    birth_year    = today.year - random.randint(20, 48)
+    birth_year    = today.year - random.randint(40, 49)
     birth_month   = random.randint(1, 12)
     birth_day     = random.randint(1, 28)
     hour          = random.randint(0, 23)

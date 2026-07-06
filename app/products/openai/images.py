@@ -1095,9 +1095,21 @@ async def _run_lite_batch(
             progress_cb=None if progress_cb is None else lambda progress: progress_cb(idx, progress),
         )
 
-    async with asyncio.TaskGroup() as tg:
-        for idx in range(n):
-            tg.create_task(_runner(idx), name=f"lite-image-{idx}")
+    # Use gather instead of TaskGroup so a single slot failure propagates as the
+    # original AppError/UpstreamError. TaskGroup wraps it in ExceptionGroup, which
+    # the OpenAI SSE wrapper serializes as a generic server_error and many clients
+    # display as an empty assistant response.
+    tasks = [
+        asyncio.create_task(_runner(idx), name=f"lite-image-{idx}")
+        for idx in range(n)
+    ]
+    try:
+        await asyncio.gather(*tasks)
+    except BaseException:
+        for task in tasks:
+            if not task.done():
+                task.cancel()
+        raise
 
     return [result for result in results if result is not None]
 
