@@ -1,15 +1,29 @@
-## One-Command Deployment and Updates
+## 三脚本部署与多实例更新
 
-On Debian/Ubuntu, run the installer below. It installs Docker, asks for the port, clones the repository, creates the configuration, starts the service, and verifies `/healthz`:
+### 你的仓库版
+
+```bash
+sudo bash -c 'curl -fsSL https://raw.githubusercontent.com/qingan123/grok2api/main/scripts/install.sh | bash'
+```
+
+### 官方上游版
 
 ```bash
 sudo bash -c 'curl -fsSL https://raw.githubusercontent.com/qingan123/grok2api/main/scripts/one-click-install.sh | bash'
 ```
 
-Update later (backs up `config.yaml` and stops if local tracked changes exist):
+### 更新指定实例
+
+更新脚本会自动列出同一服务器上的 grok2api 端口、Compose目录和服务名。输入编号、端口或目录后，只更新选中的实例；更新前会备份配置并拒绝覆盖未提交修改。
 
 ```bash
 sudo bash -c 'curl -fsSL https://raw.githubusercontent.com/qingan123/grok2api/main/scripts/update.sh | bash'
+```
+
+非交互方式：
+
+```bash
+sudo APP_DIR=/opt/grok2api GROK2API_PORT=8000 bash -c 'curl -fsSL https://raw.githubusercontent.com/qingan123/grok2api/main/scripts/update.sh | bash'
 ```
 
 The original Grok2API documentation follows unchanged.
