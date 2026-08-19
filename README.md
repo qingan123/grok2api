@@ -1,5 +1,20 @@
-<img alt="Grok2API" src="https://github.com/user-attachments/assets/037a0a6e-7986-41cc-b4af-04df612ee886" />
+## One-Command Deployment and Updates
 
+On Debian/Ubuntu, run the installer below. It installs Docker, asks for the port, clones the repository, creates the configuration, starts the service, and verifies `/healthz`:
+
+```bash
+sudo bash -c 'curl -fsSL https://raw.githubusercontent.com/qingan123/grok2api/main/scripts/one-click-install.sh | bash'
+```
+
+Update later (backs up `config.yaml` and stops if local tracked changes exist):
+
+```bash
+sudo bash -c 'curl -fsSL https://raw.githubusercontent.com/qingan123/grok2api/main/scripts/update.sh | bash'
+```
+
+The original Grok2API documentation follows unchanged.
+
+<img alt="Grok2API" src="https://github.com/user-attachments/assets/037a0a6e-7986-41cc-b4af-04df612ee886" />
 [![Python](https://img.shields.io/badge/python-3.13%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.119%2B-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![Version](https://img.shields.io/badge/version-2.0.4.rc2-111827)](pyproject.toml)
