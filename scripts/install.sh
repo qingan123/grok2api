@@ -21,8 +21,8 @@ if grep -q '^SERVER_HOST=' .env; then sed -i 's/^SERVER_HOST=.*/SERVER_HOST=0.0.
 if grep -q '^SERVER_PORT=' .env; then sed -i 's/^SERVER_PORT=.*/SERVER_PORT=8000/' .env; else printf 'SERVER_PORT=8000\n' >> .env; fi
 chmod 600 .env
 docker compose --env-file .env up -d --pull always
-for _ in {1..30}; do curl -fsS --max-time 2 "http://127.0.0.1:$PORT/healthz" >/dev/null && break; sleep 1; done
-curl -fsS --max-time 2 "http://127.0.0.1:$PORT/healthz" >/dev/null || { docker compose logs --tail=100; exit 1; }
+for _ in {1..30}; do curl -fsS --max-time 2 "http://127.0.0.1:$PORT/health" >/dev/null && break; sleep 1; done
+curl -fsS --max-time 2 "http://127.0.0.1:$PORT/health" >/dev/null || { docker compose logs --tail=100; exit 1; }
 ip="${PUBLIC_HOST:-$(curl -4fsS --max-time 5 https://api.ipify.org || true)}"
-url=${ip:+http://$ip:$PORT/}; [[ -n "$url" ]] || url='公网IP探测失败，请检查安全组/UFW'
-printf '部署完成。\n公网地址: %s\n本机地址: http://127.0.0.1:%s/\n端口: %s（绑定 0.0.0.0）\n目录: %s\n' "$url" "$PORT" "$PORT" "$APP_DIR"
+url=${ip:+http://$ip:$PORT/admin/login}; [[ -n "$url" ]] || url='公网IP探测失败，请检查安全组/UFW'
+printf '部署完成。\n公网后台: %s\n本机后台: http://127.0.0.1:%s/admin/login\n端口: %s（绑定 0.0.0.0）\n目录: %s\n' "$url" "$PORT" "$PORT" "$APP_DIR"
